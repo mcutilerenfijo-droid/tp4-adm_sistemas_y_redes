@@ -1,0 +1,48 @@
+# Servicios del TP2: servidor web (nginx) y monitoreo (Netdata).
+# Se levanta desde la raíz del repo con:
+#   sudo docker compose -f docker/docker-compose.yml up -d
+name: tp2
+
+services:
+  web:
+    image: nginx:1.27-alpine
+    container_name: tp-web
+    restart: always
+    ports:
+      # Solo en la IP de la VPN: en la interfaz pública el puerto 80 no existe.
+      - "10.0.0.1:80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /var/www/html:/usr/share/nginx/html:ro   # página principal (la genera tp2-generar-index.sh)
+      - /home:/home:ro                           # public_html de cada usuario, en solo lectura
+      - /etc/tp2/web:/etc/nginx/tp2:ro           # bonus: htpasswd de la carpeta privado/
+
+  monitoreo:
+    image: netdata/netdata:stable
+    container_name: tp-monitoreo
+    hostname: ServidorTP2
+    restart: always
+    # Red y PID del host: así Netdata ve wg0, los discos y los procesos reales del servidor.
+    # No lleva "ports": escucha directamente en 10.0.0.1:19999 (ver netdata/netdata.conf).
+    network_mode: host
+    pid: host
+    cap_add:
+      - SYS_PTRACE
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - ./netdata/netdata.conf:/etc/netdata/netdata.conf:ro
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /:/host/root:ro,rslave
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+
+volumes:
+  netdatalib:
+  netdatacache:

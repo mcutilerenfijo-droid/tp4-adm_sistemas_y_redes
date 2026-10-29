@@ -1,0 +1,10 @@
+# /etc/cron.d/tp2 — Tareas programadas del TP2 (permisos 644, dueño root).
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Backup de /home todos los días a las 02:00.
+# Para la demo se puede cambiar temporalmente "0 2 * * *" por "*/5 * * * *".
+0 2 * * *    root  /usr/local/bin/tp2-backup-home.sh >> /var/log/tp2-backup.log 2>&1
+
+# Regenera la página principal con los usuarios que tienen public_html.
+*/5 * * * *  root  /usr/local/bin/tp2-generar-index.sh

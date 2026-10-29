@@ -1,0 +1,16 @@
+# Configuración del CLIENTE (la otra computadora de la demo).
+#   Linux:   /etc/wireguard/wg0.conf  ->  sudo wg-quick up wg0
+#   Windows: app WireGuard -> "Importar túnel desde archivo" (o "Agregar túnel vacío" y pegar)
+# scripts/wg-agregar-peer.sh genera este archivo ya completo en /root/wg-clientes/<nombre>.conf
+[Interface]
+PrivateKey = <clave privada del cliente>
+Address = 10.0.0.2/24
+
+[Peer]
+# Clave pública del servidor: sudo cat /etc/wireguard/publickey
+PublicKey = <clave pública del servidor>
+# IP de la VM en la red local (adaptador puente) o IP del host si se usa NAT con reenvío de puertos.
+Endpoint = 192.168.1.50:51820
+# Solo la red de la VPN pasa por el túnel; el resto del tráfico del cliente sale normal.
+AllowedIPs = 10.0.0.0/24
+PersistentKeepalive = 25

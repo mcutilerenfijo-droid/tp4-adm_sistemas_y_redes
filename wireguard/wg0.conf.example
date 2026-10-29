@@ -1,0 +1,14 @@
+# /etc/wireguard/wg0.conf  (permisos 600, dueño root)
+# Plantilla: __PRIVATE_KEY__ se reemplaza por el contenido de /etc/wireguard/privatekey.
+# NUNCA subir el wg0.conf real al repositorio.
+[Interface]
+Address = 10.0.0.1/24
+ListenPort = 51820
+PrivateKey = __PRIVATE_KEY__
+
+# Los clientes se agregan al final con scripts/wg-agregar-peer.sh, que genera bloques así:
+#
+# # peer: notebook-matias
+# [Peer]
+# PublicKey = <clave pública del cliente>
+# AllowedIPs = 10.0.0.2/32
